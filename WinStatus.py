@@ -15,7 +15,7 @@ file.close()
 while True:
 	while True:
 		try:
-			StatusVal = input('Enter Status val (Enter quit to return)>> ')
+			StatusVal = input('Enter Status Val (Enter quit to return)>> ')
 			if StatusVal == 'quit':
 				break
 			formatted_string = "{} -> {}".format(StatusVal, WinStatusVal_STATUS[StatusVal])
@@ -24,11 +24,10 @@ while True:
 			print("Error :(")
 	while True:
 		try:
-			STATUS = input('Enter Status string (Enter quit to return)>> ')
+			STATUS = input('Enter Status String (Enter quit to return)>> ')
 			if STATUS == 'quit':
 				break
 			formatted_string = "{} -> {}".format(STATUS, WinSTATUS_StatusVal[STATUS])
 			print(formatted_string)
 		except:
 			print("Error :(")
-
