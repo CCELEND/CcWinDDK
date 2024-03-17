@@ -1,23 +1,34 @@
 #coding=utf-8
-from capstone import *
 
-WinStatus_dic = {}
+WinStatusVal_STATUS = {}
+WinSTATUS_StatusVal = {}
 
 with open("WinStatus.txt", "r") as file:
 	for line in file:
-		splitlist = line.split(' ', 5)
-		key = splitlist[0]
-		val = splitlist[1]
-		WinStatus_dic[val] = key
-
+		SplitList = line.split(' ', 5)
+		STATUS = SplitList[0]
+		StatusVal = SplitList[1]
+		WinSTATUS_StatusVal[STATUS] = StatusVal
+		WinStatusVal_STATUS[StatusVal] = STATUS
 file.close()
 
-
 while True:
-	try:
-		Status = input('Enter Status Num>> ')
-		formatted_string = "{} -> {}".format(Status, WinStatus_dic[Status])
-		print(formatted_string)
-	except:
-		print("error :(")
+	while True:
+		try:
+			StatusVal = input('Enter Status val (Enter quit to return)>> ')
+			if StatusVal == 'quit':
+				break
+			formatted_string = "{} -> {}".format(StatusVal, WinStatusVal_STATUS[StatusVal])
+			print(formatted_string)
+		except:
+			print("Error :(")
+	while True:
+		try:
+			STATUS = input('Enter Status string (Enter quit to return)>> ')
+			if STATUS == 'quit':
+				break
+			formatted_string = "{} -> {}".format(STATUS, WinSTATUS_StatusVal[STATUS])
+			print(formatted_string)
+		except:
+			print("Error :(")
 
