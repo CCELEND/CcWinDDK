@@ -15,8 +15,8 @@ int main()
     printf("[*] OS Version: %d.%d.%d.%d\n",
         OSVersion.MajorVersion, OSVersion.MinorVersion, OSVersion.BuildNumber, OSVersion.RevisionNumber);
 
-    HANDLE hCurrentProc = GetCurrentProcess(); // 获取当前进程句柄
-    DWORD CurrentPid = GetCurrentProcessId(); // 获取当前进程pid
+    HANDLE hCurrentProc = GetCurrentProcess(); // 鑾峰彇褰撳墠杩涚▼鍙ユ焺
+    DWORD CurrentPid = GetCurrentProcessId(); // 鑾峰彇褰撳墠杩涚▼pid
 
     HMODULE ntdll = GetModuleHandleA("ntdll");
     if (ntdll == NULL) {
