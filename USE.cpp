@@ -6,7 +6,6 @@
 DWORD64 NTOKernelBase;
 HMODULE NTOUserBase;
 
-
 int main()
 {
 
@@ -30,4 +29,9 @@ int main()
     NTOUserBase = GetModuleByName(wNtoPath);
     printf("[+] ntoskrnl user base: %llx\n", (DWORD64)NTOUserBase);
 
+
+    LPCSTR NtoPath = "\\SystemRoot\\system32\\ntoskrnl.exe";
+    char ExpandedPath[MAXIMUM_FILENAME_LENGTH];
+    // 展开环境变量，ExpandedPath 包含了完整的文件路径
+    ExpandEnvironmentStrings(NtoPath, ExpandedPath, MAX_PATH);
 }
