@@ -734,8 +734,6 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
     ZeroMemory(&si, sizeof(si));
     si.StartupInfo.cb = sizeof(si);
     si.lpAttributeList = NULL;
-    wchar_t cmd_process[] = L"C:\\Windows\\System32\\cmd.exe";
-
 
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
@@ -918,26 +916,33 @@ void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
     switch (OSVersion.MajorVersion) {
     case 10:
         switch (OSVersion.BuildNumber) {
-        case 14393:
-            std::wcout << L"  Windows 10 1607 / Windows Server 2016" << std::endl;
+        case 14393: std::wcout << L"  Windows 10 1607 / Windows Server 2016" << std::endl;
             PAGEDATA_NtSeDebugPrivilege_Offset = WS16_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
-        case 17763:
-            std::wcout << L"  Windows 10 1809 / Windows Server 2019" << std::endl;
+        case 17763: std::wcout << L"  Windows 10 1809 / Windows Server 2019" << std::endl;
             PAGEDATA_NtSeDebugPrivilege_Offset = WS19_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
-        case 10240: std::wcout << L"  Windows 10 1507" << std::endl; break;
-        case 10586: std::wcout << L"  Windows 10 1511" << std::endl; break;
-        case 15063: std::wcout << L"  Windows 10 1703" << std::endl; break;
-        case 16299: std::wcout << L"  Windows 10 1709" << std::endl; break;
-        case 17134: std::wcout << L"  Windows 10 1803" << std::endl; break;
-        case 18362: std::wcout << L"  Windows 10 1903" << std::endl; break;
-        case 18363: std::wcout << L"  Windows 10 1909" << std::endl; break;
-        case 19041: std::wcout << L"  Windows 10 2004 / Windows Server 2004" << std::endl; break;
-        case 19042: std::wcout << L"  Windows 10 20H2 / Windows Server 20H2" << std::endl; break;
-        case 19043: std::wcout << L"  Windows 10 21H1 / Windows Server 21H1" << std::endl; break;
-        case 20348:
-            std::wcout << L"  Windows Server 2022" << std::endl;
+        case 10240: std::wcout << L"  Windows 10 1507" << std::endl; 
+            break;
+        case 10586: std::wcout << L"  Windows 10 1511" << std::endl; 
+            break;
+        case 15063: std::wcout << L"  Windows 10 1703" << std::endl; 
+            break;
+        case 16299: std::wcout << L"  Windows 10 1709" << std::endl; 
+            break;
+        case 17134: std::wcout << L"  Windows 10 1803" << std::endl; 
+            break;
+        case 18362: std::wcout << L"  Windows 10 1903" << std::endl; 
+            break;
+        case 18363: std::wcout << L"  Windows 10 1909" << std::endl; 
+            break;
+        case 19041: std::wcout << L"  Windows 10 2004 / Windows Server 2004" << std::endl; 
+            break;
+        case 19042: std::wcout << L"  Windows 10 20H2 / Windows Server 20H2" << std::endl; 
+            break;
+        case 19043: std::wcout << L"  Windows 10 21H1 / Windows Server 21H1" << std::endl; 
+            break;
+        case 20348: std::wcout << L"  Windows Server 2022" << std::endl;
             switch (OSVersion.RevisionNumber) {
             case 2227:
                 PAGEDATA_NtSeDebugPrivilege_Offset = WS22_PAGEDATA_NtSeDebugPrivilege_Offset_1;
