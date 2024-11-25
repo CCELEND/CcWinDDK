@@ -501,7 +501,7 @@ DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
 // 通过 nto 句柄查找 SeDebugPrivilege 的偏移
 UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
 {
-    // ObSetRefTraceInformation
+    // ObSetRefTraceInformation 函数 WS2008-WS2022都有
     BYTE pattern[] = {
         0x48, 0x89, 0x5C, 0x24, 0x08,
         0x48, 0x89, 0x74, 0x24, 0x10,
