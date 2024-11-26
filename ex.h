@@ -917,7 +917,7 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
         HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
 }
 // 弹出 CMD
-int spwan_cmd_system()
+int SpwanCmdSystem()
 {
     DWORD winlogonPID;
 
