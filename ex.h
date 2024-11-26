@@ -516,6 +516,8 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     UINT_PTR ObSetRefTraceInformation = 0;
     UINT_PTR SeDebugPrivilegeOffset = 0;
 
+    HANDLE hCurrentProc = GetCurrentProcess()
+
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)hModule;
     PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)hModule + pDosHeader->e_lfanew);
     PIMAGE_SECTION_HEADER pSectionHeader = IMAGE_FIRST_SECTION(pNtHeaders);
@@ -528,8 +530,8 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
             LPVOID lpSectionBaseAddress = (LPVOID)((LPBYTE)hModule + pSectionHeader[i].VirtualAddress);
             SIZE_T dwSectionSize = pSectionHeader[i].Misc.VirtualSize;
 
-            if (ScanSectionForPattern(
-                GetCurrentProcess(), lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)) {
+            if (ScanSectionForPattern(hCurrentProc, 
+                lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)) {
                 // 计算 ObSetRefTraceInformation 相对偏移量
                 ObSetRefTraceInformationOffset = (UINT_PTR)lpFoundAddress - (UINT_PTR)hModule;
                 ObSetRefTraceInformation = (UINT_PTR)lpFoundAddress;
@@ -544,29 +546,32 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
         return 0;
     }
 
+    // mov     rcx, qword ptr cs:SeDebugPrivilege.LowPart ; PrivilegeValue 指令地址
     UINT_PTR MOV_RCX_SeDebugPrivilege = ObSetRefTraceInformation + 0x27;
+    UINT_PTR MOV_RCX_SeDebugPrivilegeOffset = ObSetRefTraceInformationOffset + 0x27;
     ObSetRefTraceInformationOffset += 0x27;
 
-    if (!ReadProcessMemory(GetCurrentProcess(),
-        (LPCVOID)(MOV_RCX_SeDebugPrivilege), buffer, 1, &bytesRead)) {
+    if (!ReadProcessMemory(hCurrentProc,
+        (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, 1, &bytesRead)) {
         ErrorStatusInfo("ReadProcessMemory failed with error.", GetLastError());
         return 0;
     }
 
+    // 旧版本的 windows server 会有5的偏移，需要判断一下
     if (buffer[0] != '\x48') {
         MOV_RCX_SeDebugPrivilege += 5;
-        ObSetRefTraceInformationOffset += 5;
+        MOV_RCX_SeDebugPrivilegeOffset += 5;
     }
 
-    if (!ReadProcessMemory(GetCurrentProcess(),
-        (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, sizeof(buffer), &bytesRead)) {
+    if (!ReadProcessMemory(hCurrentProc,
+        (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, 8, &bytesRead)) {
         ErrorStatusInfo("ReadProcessMemory failed with error.", GetLastError());
         return 0;
     }
 
-    // 从偏移 3 开始，取 4 个字节
+    // 从偏移 3 开始，取 4 个字节，转换为整形
     SeDebugPrivilegeOffset = ConvertBytesToUInt64(buffer, 3, 4);
-    SeDebugPrivilegeOffset += ObSetRefTraceInformationOffset + 7;
+    SeDebugPrivilegeOffset += MOV_RCX_SeDebugPrivilegeOffset + 7;
 
     return SeDebugPrivilegeOffset;
 }
