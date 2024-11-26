@@ -497,7 +497,7 @@ DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
 
     return result;
 }
-// 通过 nto 句柄查找 SeDebugPrivilege 的偏移
+// 通过 ntoskrnl user 句柄查找 SeDebugPrivilege 的偏移
 UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
 {
     // ObSetRefTraceInformation 函数 WS2008-WS2025 都有
@@ -569,7 +569,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
         return 0;
     }
 
-    // 从偏移 3 开始，取 4 个字节，转换为整形(小端)
+    // 从偏移3开始，取4个字节，转换为整形(小端)
     SeDebugPrivilegeOffset = ConvertBytesToUInt64(buffer, 3, 4);
     SeDebugPrivilegeOffset += MOV_RCX_SeDebugPrivilegeOffset + 7;
 
