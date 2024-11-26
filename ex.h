@@ -446,7 +446,6 @@ BOOL ScanSectionForPattern(HANDLE hProcess,
     free(buffer);
     return FALSE;
 }
-
 // 通过字节序列查找指定模块句柄的指令偏移
 UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 {
@@ -477,6 +476,7 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
     return relativeOffset;
 }
 
+
 // 将传入的字节数组解析为一个 DWORD64 类型整数(小端序的字节顺序)
 // pattern: 指向输入字节数组的指针
 // offset: 偏移量，指定从数组的偏移开始处理
@@ -497,11 +497,10 @@ DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
 
     return result;
 }
-
 // 通过 nto 句柄查找 SeDebugPrivilege 的偏移
 UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
 {
-    // ObSetRefTraceInformation 函数 WS2008-WS2022都有
+    // ObSetRefTraceInformation 函数 WS2008-WS2022 都有
     BYTE pattern[] = {
         0x48, 0x89, 0x5C, 0x24, 0x08,
         0x48, 0x89, 0x74, 0x24, 0x10,
@@ -532,8 +531,9 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
 
             if (ScanSectionForPattern(hCurrentProc, 
                 lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)) {
-                // 计算 ObSetRefTraceInformation 相对偏移量
+                // 计算 ObSetRefTraceInformation 相对偏移
                 ObSetRefTraceInformationOffset = (UINT_PTR)lpFoundAddress - (UINT_PTR)hModule;
+                // ObSetRefTraceInformation 实际地址
                 ObSetRefTraceInformation = (UINT_PTR)lpFoundAddress;
             }
             break;
@@ -569,7 +569,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
         return 0;
     }
 
-    // 从偏移 3 开始，取 4 个字节，转换为整形
+    // 从偏移 3 开始，取 4 个字节，转换为整形(小端)
     SeDebugPrivilegeOffset = ConvertBytesToUInt64(buffer, 3, 4);
     SeDebugPrivilegeOffset += MOV_RCX_SeDebugPrivilegeOffset + 7;
 
