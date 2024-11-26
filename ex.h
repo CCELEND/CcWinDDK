@@ -547,6 +547,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     }
 
     // mov     rcx, qword ptr cs:SeDebugPrivilege.LowPart ; PrivilegeValue 指令地址
+    // 字节码前3字节：\x48 \x8B \x0D
     UINT_PTR MOV_RCX_SeDebugPrivilege = ObSetRefTraceInformation + 0x27;
     UINT_PTR MOV_RCX_SeDebugPrivilegeOffset = ObSetRefTraceInformationOffset + 0x27;
 
