@@ -500,7 +500,7 @@ DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
 // 通过 nto 句柄查找 SeDebugPrivilege 的偏移
 UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
 {
-    // ObSetRefTraceInformation 函数 WS2008-WS2022 都有
+    // ObSetRefTraceInformation 函数 WS2008-WS2025 都有
     BYTE pattern[] = {
         0x48, 0x89, 0x5C, 0x24, 0x08,
         0x48, 0x89, 0x74, 0x24, 0x10,
@@ -549,7 +549,6 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     // mov     rcx, qword ptr cs:SeDebugPrivilege.LowPart ; PrivilegeValue 指令地址
     UINT_PTR MOV_RCX_SeDebugPrivilege = ObSetRefTraceInformation + 0x27;
     UINT_PTR MOV_RCX_SeDebugPrivilegeOffset = ObSetRefTraceInformationOffset + 0x27;
-    ObSetRefTraceInformationOffset += 0x27;
 
     if (!ReadProcessMemory(hCurrentProc,
         (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, 1, &bytesRead)) {
