@@ -486,7 +486,7 @@ DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
     // 检查输入是否有效
     if (!pattern || length == 0 || length > 8) {
         printf("[-] Invalid input: pattern is null, length is zero, or exceeds 8.\n");
-        return 0;
+        return 0xFFFFFFFF;
     }
 
     DWORD64 result = 0;
