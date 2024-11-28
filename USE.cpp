@@ -2,6 +2,18 @@
 
 #pragma comment(lib, "ntdll.lib")
 
+extern pNtWriteVirtualMemory NtWriteVirtualMemory;
+extern pNtReadVirtualMemory NtReadVirtualMemory;
+extern pNtQuerySystemInformation NtQuerySystemInfor;
+
+extern LPCWSTR wCmdPath;
+extern LPCSTR CmdPath;
+extern LPCWSTR wNtoPath;
+extern LPCSTR NtoPath;
+
+extern LPCWSTR wNtoRootPath;
+extern LPCSTR NtoRootPath;
+
 DWORD64 NTOKernelBase;
 HMODULE NTOUserBase;
 DWORD64 SeDebugPrivilegeAddr;
@@ -24,6 +36,7 @@ int main()
     }
     NtWriteVirtualMemory = (pNtWriteVirtualMemory)GetProcAddress(ntdll, "NtWriteVirtualMemory");
     NtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(ntdll, "NtReadVirtualMemory");
+    NtQuerySystemInfor = (pNtQuerySystemInformation)GetProcAddress(ntdll, "NtQuerySystemInformation");
 
     NTOKernelBase = GetModuleAddrByName(NtoRootPath);
     NTOUserBase = GetModuleByName(wNtoPath);
@@ -41,6 +54,8 @@ int main()
     ExpandEnvironmentStrings(NtoPath, ExpandedPath, 255);
 
     std::wcout << ExpandedPath << std::endl;
+
+    system("pause");
 
     FreeLibrary(NTOUserBase);
 }
