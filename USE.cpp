@@ -35,11 +35,12 @@ int main()
     printf("[+] SeDebugPrivilege offset: %llx\n", SeDebugPrivilegeAddrOffset);
     printf("[+] SeDebugPrivilege: %llx\n", SeDebugPrivilegeAddr);
 
-
     LPCWSTR NtoPath = L"\\SystemRoot\\system32\\ntoskrnl.exe";
     WCHAR ExpandedPath[MAXIMUM_FILENAME_LENGTH];
     // 展开环境变量，ExpandedPath 包含了完整的文件路径
     ExpandEnvironmentStrings(NtoPath, ExpandedPath, 255);
 
     std::wcout << ExpandedPath << std::endl;
+
+    FreeLibrary(NTOUserBase);
 }
