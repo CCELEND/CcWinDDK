@@ -515,7 +515,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     UINT_PTR ObSetRefTraceInformation = 0;
     UINT_PTR SeDebugPrivilegeOffset = 0;
 
-    HANDLE hCurrentProc = GetCurrentProcess()
+    HANDLE hCurrentProc = GetCurrentProcess();
 
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)hModule;
     PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)hModule + pDosHeader->e_lfanew);
@@ -864,6 +864,10 @@ void CreateCmdProcFromHandle(HANDLE hProcess) {
         }
 
         lpValue = HeapAlloc(GetProcessHeap(), 0, sizeof(HANDLE));
+        if (lpValue == NULL) {
+            ErrorStatusInfo("Failed to HeapAlloc.", GetLastError());
+            break;
+        }
         memcpy(lpValue, &hProcess, sizeof(HANDLE));
 
         status = UpdateProcThreadAttribute(
