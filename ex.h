@@ -543,6 +543,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     SIZE_T bytesRead = 0;
     BYTE* buffer = (BYTE*)malloc(8);
     if (buffer == NULL) {
+        ErrorStatusInfo("Memory allocation failed.", GetLastError());
         return 0;
     }
 
@@ -554,6 +555,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     if (!ReadProcessMemory(hCurrentProc,
         (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, 1, &bytesRead)) {
         ErrorStatusInfo("ReadProcessMemory failed with error.", GetLastError());
+        free(buffer);
         return 0;
     }
 
@@ -566,6 +568,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     if (!ReadProcessMemory(hCurrentProc,
         (LPCVOID)MOV_RCX_SeDebugPrivilege, buffer, 8, &bytesRead)) {
         ErrorStatusInfo("ReadProcessMemory failed with error.", GetLastError());
+        free(buffer);
         return 0;
     }
 
@@ -573,6 +576,7 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
     SeDebugPrivilegeOffset = ConvertBytesToUInt64(buffer, 3, 4);
     SeDebugPrivilegeOffset += MOV_RCX_SeDebugPrivilegeOffset + 7;
 
+    free(buffer);
     return SeDebugPrivilegeOffset;
 }
 
@@ -814,7 +818,7 @@ DWORD CreateProcFromHandleCommand(HANDLE Handle, LPWSTR Command) {
         &pi
     );
 
-    if (ret == false) {
+    if (ret == FALSE) {
         ErrorStatusInfo("Error creating new process.", GetLastError());
         return 3;
     }
