@@ -25,7 +25,7 @@ int main()
     NtWriteVirtualMemory = (pNtWriteVirtualMemory)GetProcAddress(ntdll, "NtWriteVirtualMemory");
     NtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(ntdll, "NtReadVirtualMemory");
 
-    NTOKernelBase = GetModuleAddrByName((LPCSTR)NtoPath);
+    NTOKernelBase = GetModuleAddrByName(NtoRootPath);
     NTOUserBase = GetModuleByName(wNtoPath);
     printf("[+] ntoskrnl kernel base: %llx\n", NTOKernelBase);
     printf("[+] ntoskrnl user base: %llx\n", (DWORD64)NTOUserBase);
