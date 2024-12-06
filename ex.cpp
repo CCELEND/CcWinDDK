@@ -345,7 +345,7 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize)
 DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length)
 {
     // 检查输入是否有效
-    if (!pattern || length == 0 || length > 8) {
+    if (!pattern || !length || length > 8) {
         printf("[-] Invalid input: pattern is null, length is zero, or exceeds 8.\n");
         return 0xFFFFFFFF;
     }
@@ -949,17 +949,14 @@ DWORD GetPagedataSectionBaseAddress(LPCWSTR filePath)
 }
 
 
-void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
-    DWORD64& PAGEDATA_NtSeDebugPrivilege_Offset)
+void ShowInfoByOSVersion(OSVERSION& OSVersion)
 {
     switch (OSVersion.MajorVersion) {
     case 10:
         switch (OSVersion.BuildNumber) {
         case 14393: std::wcout << L"  Windows 10 1607 / Windows Server 2016" << std::endl;
-            PAGEDATA_NtSeDebugPrivilege_Offset = WS16_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
         case 17763: std::wcout << L"  Windows 10 1809 / Windows Server 2019" << std::endl;
-            PAGEDATA_NtSeDebugPrivilege_Offset = WS19_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
         case 10240: std::wcout << L"  Windows 10 1507" << std::endl;
             break;
@@ -984,10 +981,8 @@ void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
         case 20348: std::wcout << L"  Windows Server 2022" << std::endl;
             switch (OSVersion.RevisionNumber) {
             case 2227:
-                PAGEDATA_NtSeDebugPrivilege_Offset = WS22_PAGEDATA_NtSeDebugPrivilege_Offset_1;
                 break;
             case 2461:
-                PAGEDATA_NtSeDebugPrivilege_Offset = WS22_PAGEDATA_NtSeDebugPrivilege_Offset_5;
                 break;
             }
             break;
@@ -1002,21 +997,17 @@ void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
         case 3:
             if (OSVersion.BuildNumber == 9600) {
                 std::wcout << L"  Windows 8.1 / Windows Server 2012 R2" << std::endl;
-                PAGEDATA_NtSeDebugPrivilege_Offset = WS12R2_PAGEDATA_NtSeDebugPrivilege_Offset;
             }
             break;
         case 2:
             if (OSVersion.BuildNumber == 9200) {
                 std::wcout << L"  Windows 8 / Windows Server 2012" << std::endl;
-                PAGEDATA_NtSeDebugPrivilege_Offset = WS12_PAGEDATA_NtSeDebugPrivilege_Offset;
             }
             break;
         case 1:
             if (OSVersion.BuildNumber == 7601) {
                 std::wcout << L"  Windows 7 SP1 / Windows Server 2008 R2 SP1" << std::endl;
             }
-
-            PAGEDATA_NtSeDebugPrivilege_Offset = WS08R2_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
         case 0:
             if (OSVersion.BuildNumber == 6002) {
@@ -1029,7 +1020,6 @@ void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
                 std::wcout << L"  Windows Vista / Windows Server 2008" << std::endl;
             }
 
-            PAGEDATA_NtSeDebugPrivilege_Offset = WS08_PAGEDATA_NtSeDebugPrivilege_Offset;
             break;
         default:
             std::wcout << L"  Unknown Windows version (Major: 6, Minor: " << OSVersion.MinorVersion << ")" << std::endl;
