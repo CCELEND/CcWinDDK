@@ -17,6 +17,8 @@
 #define SystemModuleInformation  0xb
 #define SystemHandleInformation 0x10
 
+#define WS12_OFFSET_TOKEN 0x348 //dt _EPROCESS Token
+
 // ws2019
 #define WS19_OFFSET_PID 0x2e0 //dt _EPROCESS UniqueProcessId
 #define WS19_OFFSET_PROCESS_LINKS 0x2e8 //dt _EPROCESS ActiveProcessLinks
@@ -26,6 +28,9 @@
 #define W10_OFFSET_PID 0x440 //UniqueProcessId
 #define W10_OFFSET_PROCESS_LINKS 0x448 //ActiveProcessLinks
 #define W10_OFFSET_TOKEN 0x4b8  //Token
+
+// ws2025
+#define WS25_OFFSET_TOKEN 0x248 //dt _EPROCESS Token
 
 #define WS08_PAGEDATA_NtSeDebugPrivilege_Offset       0xB0
 #define WS08R2_PAGEDATA_NtSeDebugPrivilege_Offset    0xB8
@@ -189,7 +194,8 @@ UINT_PTR FindPattern(HMODULE hModule, BYTE* pattern, SIZE_T patternSize);
 DWORD64 ConvertBytesToUInt64(const BYTE* pattern, size_t offset, size_t length);
 // 通过 ntoskrnl user 句柄查找 SeDebugPrivilege 的偏移
 UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule);
-
+// 通过 ntoskrnl user 句柄查找 Token 的偏移
+UINT_PTR FindTokenOffset(HMODULE hModule);
 
 typedef LONG(WINAPI* RtlGetVersionFunc)(PRTL_OSVERSIONINFOW);
 // 从注册表中读取 Revision 修补版本
@@ -231,5 +237,5 @@ DWORD GetPagedataSectionBaseAddress(LPCWSTR filePath);
 void SetNtSeDebugPrivilegeOffsetByOSVersion(OSVERSION& OSVersion,
     DWORD64& PAGEDATA_NtSeDebugPrivilege_Offset);
 
-// 输出缓冲区的十六进制值
+// 输出缓冲区的十六进制值 charsdolines 输出多少字节换行
 void PrintBinary(PBYTE buffer, DWORD64 len, DWORD64 charsdolines);
