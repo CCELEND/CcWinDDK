@@ -3,6 +3,7 @@
 pNtWriteVirtualMemory NtWriteVirtualMemory;
 pNtReadVirtualMemory NtReadVirtualMemory;
 pNtQuerySystemInformation NtQuerySystemInfor;
+pNtQueryInformationToken NtQueryInfoToken;
 
 LPCWSTR wCmdPath = L"C:\\Windows\\System32\\cmd.exe";
 LPCSTR CmdPath = "C:\\Windows\\System32\\cmd.exe";
