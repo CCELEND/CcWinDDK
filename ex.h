@@ -112,7 +112,7 @@ typedef NTSTATUS(WINAPI* PNtQuerySystemInformation)(
     __in ULONG SystemInformationLength,
     __out_opt PULONG ReturnLength
 );
-typedef NTSTATUS NtQueryInformationToken(
+typedef NTSTATUS(*pNtQueryInformationToken)(
     HANDLE                  TokenHandle, //要查询的令牌的句柄
     TOKEN_INFORMATION_CLASS TokenInformationClass,//一个枚举值，指定要查询的令牌信息的类型
     PVOID                   TokenInformation, //指向缓冲区的指针，该缓冲区用于接收查询到的信息。
