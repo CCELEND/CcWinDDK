@@ -159,6 +159,9 @@ PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid);
 // 通过进程名获取 pid
 ULONG GetPidByName(LPCWSTR ProcName);
 
+//通过句柄、进程ID获取kThreadAddr
+DWORD64 GetkThreadAddrByHandle(HANDLE HandleValue, DWORD ProcPid);
+
 // 创建文件对象返回句柄
 // 如果文件存在，则打开文件; 如果文件不存在，则创建新文件
 HANDLE CreatFileObject(LPCWSTR FilePath);
