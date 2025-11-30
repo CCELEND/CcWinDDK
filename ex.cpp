@@ -19,6 +19,17 @@ void ErrorStatusInfo(LPCSTR ErrorMsg, int error)
     printf("    └──> %d\n", error);
 }
 
+//通过句柄、进程ID获取kThreadAddr
+DWORD64 GetkThreadAddrByHandle(HANDLE HandleValue, DWORD ProcPid)
+{
+    HANDLE hToken;
+    DWORD64 kThreadAddr;
+    OpenProcessToken(HandleValue, TOKEN_ALL_ACCESS, &hToken);
+    kThreadAddr = (DWORD64)GetKernelPointerByHandle(hToken, ProcPid);
+    CloseHandle(hToken);
+    return kThreadAddr;
+}
+
 // 通过句柄、进程ID获取内核对象指针
 PVOID GetKernelPointerByHandle(HANDLE HandleValue, DWORD ProcPid)
 {
